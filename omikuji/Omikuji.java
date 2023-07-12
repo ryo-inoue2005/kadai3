@@ -1,8 +1,8 @@
 package omikuji;
 
 /**
- * Omikuji抽象クラス. <br>
- * Omikuji抽象クラスは、おみくじ周りを管理します。
+ * Omikujiクラス. <br>
+ * Omikujiクラスは、おみくじ周りを管理します。
  *
  * @author Ryo.inoue
  * @version 1.00
@@ -17,6 +17,8 @@ public abstract class Omikuji implements Fortune {
 	protected String akinai;
 	/** 学問を表します */
 	protected String gakumon;
+	/** おみくじコードを表します */
+	protected int omikujiCode;
 
 	/**
 	 * 運勢の取得
@@ -38,7 +40,7 @@ public abstract class Omikuji implements Fortune {
 	public String getAkinai() {
 		return akinai;
 	}
-	
+
 	/**
 	 * 学問の取得
 	 */
@@ -47,8 +49,13 @@ public abstract class Omikuji implements Fortune {
 	}
 
 	/**
-	 * 運勢をセットするメソッド
-	 * <br>
+	 * おみくじコードの取得
+	 */
+	public int getOmikujiCode() {
+		return omikujiCode;
+	}
+
+	/**
 	 * 運勢をセットします。	
 	 * 
 	 * @param negaigoto
@@ -59,6 +66,16 @@ public abstract class Omikuji implements Fortune {
 	 * 			学問
 	 */
 	public abstract void setUnsei(String negaigoto, String akinai, String gakumon);
+
+	/**
+	 * おみくじコードをセットします。	
+	 * 
+	 * @param code
+	 * 			おみくじコード
+	 */
+	public void setOmikujiCode(int code) {
+		this.omikujiCode = code;
+	}
 
 	/**
 	 * @see Fortune#disp()

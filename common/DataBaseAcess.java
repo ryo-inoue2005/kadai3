@@ -74,6 +74,20 @@ public final class DataBaseAcess {
 	public void setData(int index, int data) throws SQLException {
 		this.preparedStatement.setInt(index, data);
 	}
+	
+	/**
+	 * 指定されたパラメータを指定されたインデックスにセットします。
+	 * 
+	 * @param index
+	 * 			インデックス
+	 * @param data
+	 * 			セットする値
+	 * @throws SQLException
+	 * 			SQL例外
+	 */
+	public void setData(int index, double data) throws SQLException {
+		this.preparedStatement.setDouble(index, data);
+	}
 
 	/**
 	 * 指定されたパラメータを指定されたインデックスにセットします。

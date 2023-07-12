@@ -2,16 +2,13 @@ package main;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
 
 import common.CsvRead;
 import common.InputCheck;
-import omikuji.Fortune;
 import omikuji.Omikuji;
-import service.GetTablesInfo;
-import service.RegisterTables;
+import service.GetOmikuji;
+import service.RegisterOmikuji;
 
 /**
  * Mainクラス. <br>
@@ -32,22 +29,12 @@ public class Main {
 		ResultSet resultSet = null;
 		Scanner scanner = new Scanner(System.in);
 
-		// 行数を指定
-		final int LINES = 50;
-
 		try {
-
 			// データベースから登録、取得するオブジェクトを生成
-			RegisterTables registerTables = new RegisterTables();
-			GetTablesInfo gettable = new GetTablesInfo();
+			RegisterOmikuji registerTables = new RegisterOmikuji();
 
-			// おみくじリストを取得
-			List<Omikuji> omikujiList = CsvRead.getUnsei();
-
-			// 50行ではなかったら登録処理を実行
-			if (omikujiList != null && gettable.getLines() != LINES) {
-				registerTables.registerOmikuji(omikujiList);
-			}
+			//おみくじを登録
+			registerTables.registerOmikuji(CsvRead.getUnsei());
 
 			// チェック用フラグ変数
 			boolean check = true;
@@ -62,31 +49,33 @@ public class Main {
 				check = InputCheck.isInputNg(birthDay);
 			}
 
-			// データベースからおみくじコードを全取得する
-			List<Integer> omikujiCodeList = gettable.getOmikujiList();
+			GetOmikuji getTable = new GetOmikuji();
 
-			// 現在の日付のミリ秒を取得する
-			Long longToday = System.currentTimeMillis() / (1000 * 60 * 60 * 24);
+			// resultテーブルから同一日と同一誕生日の結果が無いか確認する
+			Omikuji omikuji = getTable.getResult(birthDay);
 
-			// 入力された誕生日と今日の日付を元にランダムオブジェクトを生成
-			Random random = new Random(longToday + Integer.parseInt(birthDay));
+			// resultテーブルに存在しなかったら、おみくじをDBから引き、resultテーブルに結果を登録する
+			if (omikuji == null) {
+				// 現在の日付のミリ秒を取得する
+				Long longToday = System.currentTimeMillis() / (1000 * 60 * 60 * 24);
+				// おみくじをDBから引く
+				omikuji = getTable.drawOmikuji(longToday + Long.parseLong(birthDay));
+				// resultテーブルに登録する
+				int result = registerTables.registerResult(birthDay, omikuji.getOmikujiCode());
 
-			// おみくじから一枚引く
-			int draw = omikujiCodeList.get(random.nextInt(omikujiCodeList.size()));
+				// 登録件数が1件以外だったら強制終了させる
+				if (result != 1) {
+					System.out.println("登録エラー");
+					return;
+				}
+			}
 
-			// 取り出したおみくじをデータベースに登録する
-			registerTables.registerResult(birthDay, draw);
-
-			// Fortune型のオブジェクトに格納 -1で調整
-			Fortune fortune = omikujiList.get(draw - 1);
-
-			// おみくじ結果を表示
-			System.out.println(fortune.disp());
+			// 結果をコンソールに表示
+			System.out.println(omikuji.disp());
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-
 			// クローズ処理
 			try {
 				if (resultSet != null) {
