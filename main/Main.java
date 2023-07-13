@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import common.InputCheck;
-import omikuji.Omikuji;
+import omikuji.Fortune;
 import service.GetTable;
 import service.RegisterTable;
 
@@ -29,10 +29,10 @@ public class Main {
 
 		try {
 			// データベースから登録、取得するオブジェクトを生成
-			RegisterTable registerTables = new RegisterTable();
+			RegisterTable registerTable = new RegisterTable();
 
 			//おみくじを登録
-			registerTables.registerOmikuji();
+			registerTable.registerOmikuji();
 
 			// チェック用フラグ変数
 			boolean check = true;
@@ -48,21 +48,23 @@ public class Main {
 			}
 
 			// データベースから取得用のオブジェクト
-			GetTable getOmikuji = new GetTable();
+			GetTable getTable = new GetTable();
 
-			// resultテーブルから同一日と同一誕生日の結果が無いか確認する
-			Omikuji omikuji = getOmikuji.getResult(birthDay);
+			// resultテーブルから同一日と同一誕生日のおみくじコードがないか確認する
+			int omikujiCode = getTable.getResult(birthDay);
 
 			// resultテーブルに存在しなかったら、おみくじをDBから引き、resultテーブルに結果を登録する
-			if (omikuji == null) {
-				
-				Random random = new Random();
+			if (omikujiCode == 0) {
 
-				// データベースからおみくじの数を取得し、ランダムにデータベースからおみくじを取得する
-				omikuji = getOmikuji.drawOmikuji(random.nextInt(getOmikuji.getMaxOmikuji()));
+				Random random = new Random();
+				
+				int min = 1;
+				
+				// データベースからおみくじの数を取得し、ランダムにおみくじコードを発行する
+				omikujiCode = random.nextInt(getTable.getMaxOmikuji() + min) + min;
 
 				// resultテーブルに登録する
-				int result = registerTables.registerResult(birthDay, omikuji.getOmikujiCode());
+				int result = registerTable.registerResult(birthDay, omikujiCode);
 
 				// 登録件数が1件以外だったら強制終了させる
 				if (result != 1) {
@@ -71,8 +73,11 @@ public class Main {
 				}
 			}
 
+			// おみくじコードでおみくじを引く
+			Fortune fortune = getTable.drawOmikuji(omikujiCode);
+
 			// 結果をコンソールに表示
-			System.out.println(omikuji.disp());
+			System.out.println(fortune.disp());
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -17,8 +17,6 @@ public abstract class Omikuji implements Fortune {
 	protected String akinai;
 	/** 学問を表します */
 	protected String gakumon;
-	/** おみくじコードを表します */
-	protected int omikujiCode;
 
 	/**
 	 * 運勢の取得
@@ -49,13 +47,6 @@ public abstract class Omikuji implements Fortune {
 	}
 
 	/**
-	 * おみくじコードの取得
-	 */
-	public int getOmikujiCode() {
-		return omikujiCode;
-	}
-
-	/**
 	 * 運勢をセットします。	
 	 * 
 	 * @param negaigoto
@@ -66,16 +57,6 @@ public abstract class Omikuji implements Fortune {
 	 * 			学問
 	 */
 	public abstract void setUnsei(String negaigoto, String akinai, String gakumon);
-
-	/**
-	 * おみくじコードをセットします。	
-	 * 
-	 * @param code
-	 * 			おみくじコード
-	 */
-	public void setOmikujiCode(int code) {
-		this.omikujiCode = code;
-	}
 
 	/**
 	 * @see Fortune#disp()

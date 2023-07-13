@@ -29,12 +29,15 @@ public class GetTable {
 	 * @throws SQLException
 	 * 			SQL例外
 	 * 
+	 * @param birthday
+	 * 			誕生日
+	 * 
 	 * @return Omikuji
 	 * 			おみくじオブジェクト
 	 * @return null
 	 * 			取得できない場合
 	 */
-	public Omikuji getResult(String birthDay) throws ClassNotFoundException, SQLException {
+	public int getResult(String birthDay) throws ClassNotFoundException, SQLException {
 
 		try {
 			// データベース接続
@@ -42,12 +45,10 @@ public class GetTable {
 
 			StringBuilder sql = new StringBuilder();
 
-			sql.append("SELECT unsei_name, negaigoto, akinai, gakumon ");
-			sql.append("FROM unseimaster AS u ");
-			sql.append("INNER JOIN omikuji AS o ON u.unsei_code = o.unsei_code ");
-			sql.append("INNER JOIN result AS r ON o.omikuji_code = r.omikuji_code ");
-			sql.append("WHERE r.create_date = CURRENT_DATE ");
-			sql.append("AND r.birthday = ? ");
+			sql.append("SELECT omikuji_code ");
+			sql.append("FROM result ");
+			sql.append("WHERE birthday = ? ");
+			sql.append("AND create_date = CURRENT_DATE ");
 
 			// SQL文をセット
 			dba.setSql(sql.toString());
@@ -58,18 +59,11 @@ public class GetTable {
 			// SQLを実行
 			ResultSet resultSet = dba.select();
 
-			Omikuji omikuji = null;
-
 			if (resultSet.next()) {
-				// 運勢名を元におみくじオブジェクトを生成
-				omikuji = OmikujiFactory.create(resultSet.getString("unsei_name"));
-				// おみくじの内容をセット
-				omikuji.setUnsei(resultSet.getString("negaigoto"), resultSet.getString("akinai"),
-						resultSet.getString("gakumon"));
 
-				return omikuji;
+				return resultSet.getInt("omikuji_code");
 			}
-			return null;
+			return 0;
 
 		} finally {
 			// データベース切断
@@ -79,12 +73,15 @@ public class GetTable {
 	}
 
 	/**
-	 * データベースからおみくじを引きます。
+	 * データベースからおみくじを取得します。
 	 * 
 	 * @throws ClassNotFoundException
 	 *			ファイル未発見例外
 	 * @throws SQLException
 	 * 			SQL例外
+	 * 
+	 * @param random
+	 * 			ランダムな数値
 	 * 
 	 * @return Omikuji
 	 * 			おみくじオブジェクト
@@ -98,13 +95,12 @@ public class GetTable {
 			dba.open();
 
 			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT u.unsei_name, o.omikuji_code, o.negaigoto, o.akinai, o.gakumon ");
+			sql.append("SELECT u.unsei_name, o.negaigoto, o.akinai, o.gakumon ");
 			sql.append("FROM unseimaster AS u ");
 			sql.append("INNER JOIN omikuji AS o ON u.unsei_code = o.unsei_code ");
 			sql.append("WHERE o.omikuji_code = ?");
-
+			
 			dba.setSql(sql.toString());
-
 			dba.setData(1, random);
 
 			ResultSet resultSet = dba.select();
@@ -117,8 +113,6 @@ public class GetTable {
 				// 運勢をセット
 				omikuji.setUnsei(resultSet.getString("negaigoto"), resultSet.getString("akinai"),
 						resultSet.getString("gakumon"));
-				// おみくじコードをセット
-				omikuji.setOmikujiCode(resultSet.getInt("omikuji_code"));
 				return omikuji;
 			}
 			return null;

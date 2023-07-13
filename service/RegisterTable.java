@@ -41,41 +41,44 @@ public class RegisterTable {
 		//CSVデータ読み込み
 		File file = new File(FILE_PATH);
 		BufferedReader br = new BufferedReader(new FileReader(file));
-
-		DataBaseAcess dba2 = new DataBaseAcess();
+		
 		try {
 			// データベース接続
 			dba.open();
-			dba2.open();
 
 			StringBuilder sql = new StringBuilder();
-			sql.append("INSERT INTO omikuji (unsei_code, negaigoto, akinai, gakumon, create_by, create_date) ");
-			sql.append("SELECT (SELECT unsei_code ");
-			sql.append("FROM unseimaster ");
-			sql.append("WHERE unsei_name = ?), ?, ?, ?, 'Ryo.inoue', CURRENT_DATE ");
+			sql.append("INSERT INTO omikuji (omikuji_code, unsei_code, negaigoto, akinai, gakumon, create_by, create_date) ");
+			sql.append("SELECT ?, ");
+			sql.append("(SELECT unsei_code "
+					+ "FROM unseimaster "
+					+ "WHERE unsei_name = ?), ");
+			sql.append("?, ?, ?, 'Ryo.inoue', CURRENT_DATE ");
 			sql.append("ON CONFLICT DO NOTHING; ");
 
 			// SQL文をセット
 			dba.setSql(sql.toString());
-			dba2.setSql("SELECT SETVAL ('omikuji_omikuji_code_seq', (SELECT MAX(omikuji_code) FROM omikuji)); ");
 
 			// 一行目を読み込む
 			String line = br.readLine();
+			
+			int omikujiCode = 1;
 
 			// CSVの行数がなくなるまで実行し、一行ずつデータベースに登録する
 			while (line != null) {
 
-				// SEREAL値を登録されているおみくじコードの最大値に設定
-				dba2.select();
-
 				String[] csvData = line.split(",");
 
 				// CSVから受け取ったデータをセットし、データベースに登録
-				dba.setData(1, csvData[0]);
-				dba.setData(2, csvData[1]);
-				dba.setData(3, csvData[2]);
-				dba.setData(4, csvData[3]);
-				dba.update();
+				dba.setData(1, omikujiCode);
+				dba.setData(2, csvData[0]);
+				dba.setData(3, csvData[1]);
+				dba.setData(4, csvData[2]);
+				dba.setData(5, csvData[3]);
+				
+				// 登録できたらおみくじコードをインクリメントする
+				if(dba.update() == 1) {
+					omikujiCode++;
+				}
 
 				// 初期化
 				csvData = null;
@@ -87,7 +90,6 @@ public class RegisterTable {
 		} finally {
 			// クローズ処理
 			dba.close();
-			dba2.close();
 			br.close();
 		}
 	}
@@ -101,6 +103,11 @@ public class RegisterTable {
 	 * 			SQL例外
 	 * @throws ParseException
 	 * 			変換時の例外
+	 * 
+	 * @param birthday
+	 * 			誕生日
+	 * @param omikujiCode
+	 * 			おみくじコード
 	 * 
 	 * @return 登録件数
 	 */
