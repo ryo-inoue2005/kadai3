@@ -57,7 +57,7 @@ public class Main {
 				int min = 1;
 				
 				// データベースからおみくじの数を取得し、ランダムにおみくじコードを発行する
-				omikujiCode = random.nextInt(getTable.getMaxOmikujiCode() + min);
+				omikujiCode = random.nextInt(min, getTable.getMaxOmikujiCode() + min);
 
 				// resultテーブルに登録する
 				int result = registerTable.registerResult(omikujiCode, birthDay);
