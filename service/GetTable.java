@@ -76,7 +76,7 @@ public class GetTable {
 	 * データベースからおみくじを取得します。
 	 * 
 	 * @throws ClassNotFoundException
-	 *			ファイル未発見例外
+	 *			クラス未発見例外
 	 * @throws SQLException
 	 * 			SQL例外
 	 * 
@@ -113,6 +113,7 @@ public class GetTable {
 				// 運勢をセット
 				omikuji.setUnsei(resultSet.getString("negaigoto"), resultSet.getString("akinai"),
 						resultSet.getString("gakumon"));
+				
 				return omikuji;
 			}
 			return null;
@@ -127,16 +128,16 @@ public class GetTable {
 	 * データベースからおみくじの数を取得します。
 	 * 
 	 * @throws ClassNotFoundException
-	 *			ファイル未発見例外
+	 *			クラス未発見例外
 	 * @throws SQLException
 	 * 			SQL例外
 	 * 
-	 * @return おみくじの数
+	 * @return	おみくじの数
 	 * 
 	 * @return 0
-	 * 			おみくじがない場合
+	 *			おみくじがない場合
 	 */
-	public int getMaxOmikuji() throws ClassNotFoundException, SQLException {
+	public int getMaxOmikujiCode() throws ClassNotFoundException, SQLException {
 		try {
 			dba.open();
 			dba.setSql("SELECT MAX(omikuji_code) AS MAX FROM omikuji");
@@ -146,6 +147,7 @@ public class GetTable {
 				return resultSet.getInt("MAX");
 			}
 			return 0;
+			
 		} finally {
 			dba.close();
 		}

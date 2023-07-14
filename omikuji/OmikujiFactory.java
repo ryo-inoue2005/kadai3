@@ -12,43 +12,36 @@ public class OmikujiFactory {
 	/**
 	 * 運勢を元におみくじオブジェクトを生成して返します。
 	 * 
-	 * @return おみくじオブジェクト
+	 * @return omikuji
+	 * 			おみくじオブジェクト
+	 * @return null
+	 * 			不正な運勢の場合
 	 */
 	public static Omikuji create(String unsei) {
-
-		// おみくじ初期化
-		Omikuji omikuji = null;
 
 		switch (unsei) {
 
 		case "大吉":
-			omikuji = new Daikichi();
-			break;
+			return new Daikichi();
 
 		case "中吉":
-			omikuji = new Chukichi();
-			break;
+			return new Chukichi();
 
 		case "吉":
-			omikuji = new Kichi();
-			break;
+			return new Kichi();
 
 		case "小吉":
-			omikuji = new Shokichi();
-			break;
+			return new Shokichi();
 
 		case "末吉":
-			omikuji = new Suekichi();
-			break;
-
+			return new Suekichi();
+			
 		case "凶":
-			omikuji = new Kyo();
-			break;
-
+			return new Kyo();
+			
 		default:
 			System.out.println("不正な運勢です");
 			return null;
 		}
-		return omikuji;
 	}
 }

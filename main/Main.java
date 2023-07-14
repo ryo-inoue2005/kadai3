@@ -1,7 +1,5 @@
 package main;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -24,7 +22,6 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 
-		ResultSet resultSet = null;
 		Scanner scanner = new Scanner(System.in);
 
 		try {
@@ -57,14 +54,13 @@ public class Main {
 			if (omikujiCode == 0) {
 
 				Random random = new Random();
-				
 				int min = 1;
 				
 				// データベースからおみくじの数を取得し、ランダムにおみくじコードを発行する
-				omikujiCode = random.nextInt(getTable.getMaxOmikuji() + min) + min;
+				omikujiCode = random.nextInt(getTable.getMaxOmikujiCode() + min);
 
 				// resultテーブルに登録する
-				int result = registerTable.registerResult(birthDay, omikujiCode);
+				int result = registerTable.registerResult(omikujiCode, birthDay);
 
 				// 登録件数が1件以外だったら強制終了させる
 				if (result != 1) {
@@ -82,15 +78,7 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			// クローズ処理
-			try {
-				if (resultSet != null) {
-					resultSet.close();
-				}
 				scanner.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 }
